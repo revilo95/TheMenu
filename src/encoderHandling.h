@@ -9,9 +9,9 @@ int knobButtonPin = 19;
 bool buttonState = false;
 uint8_t btnInterval = 200;
 
-//To choose the menu IP, SSID, PW, Universe and Save
+//To choose the menu IP, SSID, PW, Universe, SaveAndRestart and back
 byte menuCounter = 0;
-byte menuMax = 4;
+byte menuMax = 5;
 
 //Limited to 255 anyway
 byte ipCount = 0;
@@ -20,12 +20,15 @@ byte ipCount = 0;
 byte uniCount = 0;
 byte uniMax = 12;
 
+byte saveCount = 0;
+
 //Flags for 
 bool menuFlag = true;
 bool ipFlag = false;
 bool uniFlag = false;
 bool ssidFlag = false;
 bool pwFlag = false;
+bool saveFlag = false;
 
 unsigned long interrupt_time = 0;
 static unsigned long last_interrupt_time = 0;
@@ -56,11 +59,17 @@ void onKnobLeftEventCallback(int count, void *usr_data)
     else if(pwFlag){
         //pwCount--;
     }
-    else{
+    else if(uniFlag){
         uniCount--;
         if(uniCount > uniMax){
             uniCount = uniMax;
         }
+    }else if(saveFlag){
+        saveCount--;
+        if(saveCount > 1){
+            saveCount = 1;
+        }
+
     }
 
     
@@ -88,10 +97,15 @@ void onKnobRightEventCallback(int count,void *usr_data)
     else if(pwFlag){
         //pwCount++;
     }
-    else{
+    else if(uniFlag){
         uniCount++;
         if(uniCount > uniMax){
             uniCount = 0;
+        }
+    }else if(saveFlag){
+        saveCount++;
+        if(saveCount > 1){
+            saveCount = 0;
         }
     }
 }

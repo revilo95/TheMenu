@@ -22,10 +22,14 @@ byte uniPosition = 0;
 byte ssidPosition = 0;
 char ASCII2[255]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+
 byte ip1, ip2, ip3, ip4; // or whatever type these variables are supposed to be
 
-
+//Pref variables
 int uni;
+String ssid;
+String pwd;
+
 
 void menuBegin(){
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
@@ -39,7 +43,7 @@ void menuBegin(){
     display.setTextColor(SSD1306_WHITE);
     display.drawBitmap(0, 0, epd_bitmap_Luzi_Thing, 128, 64, WHITE);
     display.display();
-    delay(2000);
+    delay(3000);
     display.clearDisplay();
     display.display();
 
@@ -56,9 +60,10 @@ void menuBegin(){
     ip3 = prefs.getUInt("ip3",0);
     ip4 = prefs.getUInt("ip4",22);
     IPAddress ip(ip1,ip2,ip3,ip4);
-    int uni = prefs.getInt("uni",0);
-    String ssid = prefs.getString("ssid","YourSSID"); //Mögliche Schwachstelle weil string müsste char* sein
-    String pwd = prefs.getString("pwd","YourPW");
+    
+    uni = prefs.getUInt("uni",0);
+    ssid = prefs.getString("ssid","YourSSID"); //Mögliche Schwachstelle weil string müsste char* sein
+    pwd = prefs.getString("pwd","YourPW");
     prefs.end();
 
 }
@@ -197,6 +202,63 @@ void setPw(){
     }
 }
 
+void SaveAndRestart(){
+    saveFlag = true;
+    menuFlag = false;
+    display.clearDisplay();
+    display.setTextSize(2);
+    display.setCursor(37,0);
+    display.println("Save");
+    display.setCursor(12,20);
+    display.setTextSize(1);
+    display.println("Node will restart!");
+    display.setCursor(25,30);
+    display.println("Are you sure?");
+
+    if(saveCount == 0){
+
+        display.setCursor(0,45);
+        display.setTextSize(2);
+        display.print("No");  
+        display.setTextSize(1); 
+        display.setCursor(90,45);     
+        display.println("Yes");
+        display.display();
+        if(buttonState == true){
+            saveFlag = !saveFlag;
+            menuFlag = !menuFlag;
+            programPosition = 1;
+        }
+    }else if(saveCount == 1){
+
+        display.setCursor(0,45);
+        display.setTextSize(1);
+        display.print("No");  
+        display.setTextSize(2); 
+        display.setCursor(90,45);     
+        display.println("Yes");
+        display.display();
+        if(buttonState == true){
+            prefs.begin("menu", false);
+            prefs.putUInt("ip1",ip1);
+            prefs.putUInt("ip2",ip2);
+            prefs.putUInt("ip3",ip3);
+            prefs.putUInt("ip4",ip4);
+            prefs.putUInt("uni",uni);
+            prefs.putString("ssid","YourSSID");
+            prefs.putString("pwd","YourPW");
+            prefs.end();
+            display.clearDisplay();
+            display.setTextSize(2);
+            display.setCursor(20,25);
+            display.println("Reboot...");
+            display.display();
+            delay(2000);
+            ESP.restart();
+        }
+    }
+}
+
 
 void mainMenu(){
     //Serial.println(menuCounter);
@@ -209,6 +271,7 @@ if(menuCounter == 0){
     display.println("Universe");
     display.println("SSID");
     display.println("Password");
+    display.println("Save");
     display.println("Back");
     display.display();
     if(buttonState == true){
@@ -224,6 +287,7 @@ if(menuCounter == 0){
     display.setTextSize(1);
     display.println("SSID");
     display.println("Password");
+    display.println("Save");
     display.println("Back");
     display.display();
         if(buttonState == true){
@@ -239,6 +303,7 @@ if(menuCounter == 0){
     display.println("SSID");
     display.setTextSize(1);
     display.println("Password");
+    display.println("Save");
     display.println("Back");
     display.display();
     if(buttonState == true){
@@ -254,6 +319,7 @@ if(menuCounter == 0){
     display.setTextSize(2);
     display.println("Password");
     display.setTextSize(1);
+    display.println("Save");
     display.println("Back");
     display.display();
     if(buttonState == true){
@@ -267,6 +333,23 @@ if(menuCounter == 0){
     display.println("Universe");
     display.println("SSID");
     display.println("Password");
+    display.setTextSize(2);
+    display.println("Save");
+    display.setTextSize(1);
+    display.println("Back");
+    display.display();
+    if(buttonState == true){
+        programPosition = 6;
+    }
+}else if(menuCounter == 5){
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.setTextSize(1);
+    display.println("IP Address ");
+    display.println("Universe");
+    display.println("SSID");
+    display.println("Password");
+    display.println("Save");
     display.setTextSize(2);
     display.println("Back");
     display.display();
@@ -291,7 +374,8 @@ void homescreen(){
     display.println(ip4);
     display.print("Uni: ");
     display.println(uni);
-    display.println("SSID: ");
+    display.print("SSID: ");
+    display.println(ssid);
     display.display();
 }
 
@@ -321,7 +405,10 @@ switch (programPosition)
     break; 
   case 5:
     setPw();
-    break;   
+    break; 
+  case 6:
+    SaveAndRestart();
+    break;    
 
 }
 }
