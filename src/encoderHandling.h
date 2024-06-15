@@ -1,11 +1,11 @@
 //#include <Arduino.h>
 #include <ESP_Knob.h>
 
-#define GPIO_NUM_KNOB_PIN_A     17
-#define GPIO_NUM_KNOB_PIN_B     16
+#define GPIO_NUM_KNOB_PIN_A     23
+#define GPIO_NUM_KNOB_PIN_B     19
 
 ESP_Knob *knob;
-int knobButtonPin = 19;
+int knobButtonPin = 25;
 bool buttonState = false;
 uint8_t btnInterval = 200;
 
