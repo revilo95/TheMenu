@@ -22,6 +22,10 @@ byte uniMax = 12;
 
 byte saveCount = 0;
 
+//SSID and PW
+byte CharsMax = 38; //Alphabet 26 Numbers 10 Save & Back 2
+byte ssidCount = 0;
+
 //Flags for 
 bool menuFlag = true;
 bool ipFlag = false;
@@ -54,7 +58,10 @@ void onKnobLeftEventCallback(int count, void *usr_data)
         }
     }
     else if(ssidFlag){
-        //ssidCount--;
+        ssidCount--;
+        if(ssidCount <= 0){
+            ssidCount = CharsMax;
+        }
     }
     else if(pwFlag){
         //pwCount--;
@@ -92,7 +99,10 @@ void onKnobRightEventCallback(int count,void *usr_data)
         }
     }
     else if(ssidFlag){
-        //ssidCount++;
+        ssidCount++;
+        if(ssidCount >= CharsMax){
+            ssidCount = 0;
+        }
     }
     else if(pwFlag){
         //pwCount++;

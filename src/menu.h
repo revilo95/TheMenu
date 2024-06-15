@@ -17,10 +17,15 @@ Preferences prefs;
 
 //Genereal Menu Navigation variable: 0 = Home, 1 = Menu, 2 = IP, 3 = Universe, 4 = SSID, 5 = Password
 byte programPosition = 0;
+
 byte ipPosition = 0;
 byte uniPosition = 0;
 byte ssidPosition = 0;
-char ASCII2[255]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+String ssidString [] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","0","1","2","3","4","5","6","7","8","9"};
+String ssidArray[10];
+byte CharPos = 0;
+byte PreCharPos = 0;
+byte displayIndex = 0;
 
 
 byte ip1, ip2, ip3, ip4; // or whatever type these variables are supposed to be
@@ -166,25 +171,58 @@ void setSsid(){
     display.setTextSize(2);
     display.setCursor(0,0);
     display.println("Set SSID");
-    int i = 0;  // Initialize i outside the loop
 
-    for (;;) {  // Infinite loop
-        readBtn(btnInterval);
-        if (buttonState == true) {
-        i++;  // Increment i when the button is pressed
-        Serial.println(i);
-        if (i > 4) {
-            break;  // Exit the loop when i exceeds 4
+    for(int i = 0; i <= 9; i++){        //Textvorschau der SSID
+        display.setCursor(PreCharPos,30);
+        display.print(ssidArray[i]);
+        PreCharPos += 12;
+        if(i == 9){
+            PreCharPos = 0;
         }
     }
-}
 
-    display.display();
+    for(displayIndex; displayIndex < 9; ){        //Befüllen des Arrays
+    display.setCursor(CharPos,30);
+    display.print(ssidString[ssidCount]);
+
+    if(ssidCount == 37){
+        display.setCursor(0,45);
+        display.setTextSize(2);
+        display.print("Cancel");  
+        display.setTextSize(1); 
+        display.setCursor(90,45);     
+        display.println("Set");
+        
         if(buttonState == true){
-        programPosition = 1;
-        ssidFlag = !ssidFlag;
-        menuFlag = !menuFlag;
+            saveFlag = !saveFlag;
+            menuFlag = !menuFlag;
+            programPosition = 1;
+        }
+    }else if(ssidCount == 38){
+
+        display.setCursor(0,45);
+        display.setTextSize(1);
+        display.print("Cancel");  
+        display.setTextSize(2); 
+        display.setCursor(90,45);     
+        display.println("Set");
+        
+        if(buttonState == true){
+            saveFlag = !saveFlag;
+            menuFlag = !menuFlag;
+            programPosition = 1;   
+        }
     }
+    if(buttonState == true){
+
+        CharPos = CharPos + 12;
+        ssidArray[displayIndex] = ssidString[ssidCount];
+        displayIndex++;
+        
+    }
+    break;
+    }
+    display.display();
 }
 
 void setPw(){
